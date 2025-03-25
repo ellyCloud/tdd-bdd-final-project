@@ -104,3 +104,68 @@ class TestProductModel(unittest.TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
+
+    # TASK 2a
+    def test_a_read_product(self):
+        """It should Read a Product"""
+        product = ProductFactory()
+        # Set the ID of the product object to None and then call the create() method on the product.
+        product.id = None 
+        product.create()
+        self.assertIsNotNone(product.id, "Product ID should not be None after creation")
+        # Fetch the product back from the DB using the product ID
+        found_product = Product.query.get(product.id)
+        # Assert that the properties of the found product match the original product obj
+        self.assertEqual(found_product.id, product.id, "Product IDs should match")
+        self.assertEqual(found_product.name, product.name, "Product names should match")
+        self.assertEqual(found_product.description, product.description, "Product descriptions should match")
+        self.assertEqual(Decimal(found_product.price), product.price, "Product prices should match")
+        self.assertEqual(found_product.available, product.available, "Product availability should match")
+        self.assertEqual(found_product.category, product.category, "Product categories should match")
+
+        app.logger.debug(f"Found Product: {found_product}")
+
+    # Task 2b
+    def test_update_a_product(self):
+        """It should Update a Product"""
+        # Step 1: Create a product
+        product = ProductFactory()
+        product.id = None  # Ensure ID is None to trigger creation
+        product.create()  # Save the product to the system
+        
+        # Step 2: Assert that the product was created and has an ID
+        self.assertIsNotNone(product.id)
+        
+        # Step 3: Update the product description and save it
+        product.description = "testing"
+        original_id = product.id
+        product.update()  # Save the updated product to the system
+        
+        # Step 4: Assert that the ID is unchanged, and the description is updated
+        self.assertEqual(product.id, original_id)
+        self.assertEqual(product.description, "testing")
+        
+        # Step 5: Fetch all products and verify there's only one product
+        products = Product.all()
+        self.assertEqual(len(products), 1)
+        
+        # Step 6: Verify that the product ID is the same and the description is updated
+        self.assertEqual(products[0].id, original_id)
+        self.assertEqual(products[0].description, "testing")
+
+    # Task 2c
+    def test_delete_a_product(self):
+        """It should Delete a Product"""
+        # Step 1: Create a product
+        product = ProductFactory()
+        product.create()  # Save the product to the system
+        # Step 2: Assert that there's only one product in the system
+        products = Product.all()
+        self.assertEqual(len(products), 1)
+        # Step 3: Delete the product from the system
+        product.delete()  # Remove the product from the system
+           # Step 4: Assert that the product has been deleted
+        products = Product.all()
+        self.assertEqual(len(products), 0)
+
+            
